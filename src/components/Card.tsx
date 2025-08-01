@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { colorThemes } from '../lib/cardData';
 import type { Card as CardType } from '../types/card';
 
 interface CardProps {
@@ -27,47 +26,10 @@ export const Card: React.FC<CardProps> = ({
     large: 'w-28 h-40 text-base',
   };
 
-  const getCardColors = () => {
-    if (card.type === 'property') {
-      return colorThemes[card.color];
-    }
-    
-    if (card.type === 'wild') {
-      // Use the first color for wild cards
-      return colorThemes[card.colors[0]];
-    }
-    
-    if (card.type === 'rent') {
-      // Use a gold theme for rent cards
-      return {
-        bg: 'bg-gradient-to-br from-yellow-100 to-yellow-200',
-        border: 'border-yellow-500',
-        text: 'text-yellow-900',
-      };
-    }
-    
-    if (card.type === 'action') {
-      return {
-        bg: 'bg-gradient-to-br from-purple-100 to-purple-200',
-        border: 'border-purple-500',
-        text: 'text-purple-900',
-      };
-    }
-    
-    // Money cards
-    return {
-      bg: 'bg-gradient-to-br from-green-100 to-green-200',
-      border: 'border-green-500',
-      text: 'text-green-900',
-    };
-  };
-
-  const colors = getCardColors();
-
   if (showBack) {
     return (
       <motion.div
-        className={`${sizeClasses[size]} rounded-xl border-2 border-indigo-300 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center cursor-pointer shadow-lg`}
+        className={`${sizeClasses[size]} rounded-xl border-4 border-gray-800 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 flex items-center justify-center cursor-pointer shadow-2xl relative overflow-hidden`}
         style={style}
         onClick={onClick}
         whileHover={{ scale: disabled ? 1 : 1.05, rotateY: 5 }}
@@ -82,21 +44,82 @@ export const Card: React.FC<CardProps> = ({
           damping: 20,
         }}
       >
-        <div className="text-white text-3xl">🐾</div>
+        {/* Card back pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent"></div>
+          <div className="absolute top-2 left-2 text-white/40 text-xs">🐾</div>
+          <div className="absolute bottom-2 right-2 text-white/40 text-xs">🐾</div>
+        </div>
+        <div className="text-white text-4xl font-black drop-shadow-lg">🐾</div>
       </motion.div>
     );
+  }
+
+  // Get vibrant colors based on card type
+  let bgGradient = 'bg-gradient-to-br from-gray-200 to-gray-300';
+  let borderColor = 'border-gray-600';
+  let textColor = 'text-gray-900';
+  let accentBg = 'bg-gray-100';
+
+  if (card.type === 'property') {
+    if (card.color === 'poodle-park') {
+      bgGradient = 'bg-gradient-to-br from-pink-400 to-pink-600';
+      borderColor = 'border-pink-800';
+      textColor = 'text-white';
+      accentBg = 'bg-pink-200';
+    } else if (card.color === 'cattown-tower') {
+      bgGradient = 'bg-gradient-to-br from-orange-400 to-orange-600';
+      borderColor = 'border-orange-800';
+      textColor = 'text-white';
+      accentBg = 'bg-orange-200';
+    } else if (card.color === 'hamster-hotel') {
+      bgGradient = 'bg-gradient-to-br from-amber-500 to-yellow-600';
+      borderColor = 'border-amber-800';
+      textColor = 'text-white';
+      accentBg = 'bg-amber-200';
+    } else if (card.color === 'bunny-burrow') {
+      bgGradient = 'bg-gradient-to-br from-green-500 to-green-700';
+      borderColor = 'border-green-900';
+      textColor = 'text-white';
+      accentBg = 'bg-green-200';
+    } else if (card.color === 'fish-tank') {
+      bgGradient = 'bg-gradient-to-br from-blue-500 to-blue-700';
+      borderColor = 'border-blue-900';
+      textColor = 'text-white';
+      accentBg = 'bg-blue-200';
+    }
+  } else if (card.type === 'money') {
+    bgGradient = 'bg-gradient-to-br from-emerald-500 to-green-600';
+    borderColor = 'border-green-900';
+    textColor = 'text-white';
+    accentBg = 'bg-green-200';
+  } else if (card.type === 'action') {
+    bgGradient = 'bg-gradient-to-br from-indigo-500 to-purple-600';
+    borderColor = 'border-indigo-900';
+    textColor = 'text-white';
+    accentBg = 'bg-indigo-200';
+  } else if (card.type === 'rent') {
+    bgGradient = 'bg-gradient-to-br from-yellow-500 to-amber-600';
+    borderColor = 'border-yellow-900';
+    textColor = 'text-white';
+    accentBg = 'bg-yellow-200';
+  } else if (card.type === 'wild') {
+    bgGradient = 'bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500';
+    borderColor = 'border-purple-900';
+    textColor = 'text-white';
+    accentBg = 'bg-purple-200';
   }
 
   return (
     <motion.div
       className={`
         ${sizeClasses[size]} 
-        ${colors.bg} 
-        ${colors.border} 
-        ${colors.text}
-        ${selected ? 'ring-4 ring-blue-400 shadow-2xl scale-105' : 'shadow-lg'}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-xl'}
-        rounded-xl border-3 flex flex-col justify-between p-3 relative overflow-hidden
+        ${bgGradient} 
+        ${borderColor} 
+        ${textColor}
+        rounded-xl border-4 flex flex-col relative overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl
+        ${selected ? 'ring-4 ring-blue-400 scale-105 ring-offset-2' : ''}
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         transform transition-all duration-200
       `}
       style={style}
@@ -117,72 +140,90 @@ export const Card: React.FC<CardProps> = ({
         stiffness: 300,
         damping: 20,
       }}
-      layout
     >
-      {/* Card Header */}
-      <div className="flex justify-between items-start mb-1">
+      {/* Card Header - Name and Value */}
+      <div className="bg-black/20 px-2 py-1 flex justify-between items-center">
         <div className="text-2xl">{card.emoji}</div>
-        <div className="text-xs font-bold bg-white/80 backdrop-blur rounded-full px-2 py-1 shadow-sm">
+        <div className={`text-xs font-black ${accentBg} text-gray-900 rounded-full px-2 py-1 shadow-sm border-2 border-white`}>
           {card.value}M
         </div>
       </div>
 
-      {/* Card Name */}
-      <div className="text-center flex-1 flex items-center justify-center px-1">
-        <h3 className="font-bold leading-tight text-center text-xs">
-          {card.name}
-        </h3>
+      {/* Card Body */}
+      <div className="flex-1 p-2 flex flex-col justify-center">
+        {/* Card Name */}
+        <div className="text-center mb-2">
+          <h3 className="font-black leading-tight text-center text-xs drop-shadow-md">
+            {card.name}
+          </h3>
+        </div>
+
+        {/* Property Set Indicators */}
+        {card.type === 'property' && (
+          <div className="flex justify-center space-x-1 mb-2">
+            {Array.from({ length: card.setSize }, (_, i) => (
+              <div 
+                key={i} 
+                className="w-2 h-2 rounded-full bg-white/80 shadow-sm"
+              />
+            ))}
+          </div>
+        )}
+        
+        {/* Wild Card Color Indicators */}
+        {card.type === 'wild' && (
+          <div className="flex justify-center items-center mb-1">
+            <div className="text-lg">⭐</div>
+          </div>
+        )}
       </div>
 
-      {/* Card Type Indicator */}
-      <div className="flex justify-between items-end text-xs mt-1">
-        <span className="capitalize font-medium opacity-80">
+      {/* Card Footer - Type */}
+      <div className="bg-black/20 px-2 py-1 flex justify-between items-center">
+        <span className="text-xs font-black uppercase tracking-wide">
           {card.type === 'wild' ? 'Wild' : 
            card.type === 'property' ? 'Property' :
            card.type === 'action' ? 'Action' :
            card.type === 'rent' ? 'Rent' : 'Money'}
         </span>
         
-        {/* Special indicators */}
-        {card.type === 'property' && (
-          <div className="flex space-x-1">
-            {Array.from({ length: card.setSize }, (_, i) => (
-              <div 
-                key={i} 
-                className="w-1.5 h-1.5 rounded-full bg-current opacity-60"
-              />
-            ))}
-          </div>
-        )}
-        
-        {card.type === 'wild' && (
-          <div className="text-xs text-yellow-600">
-            ⭐
-          </div>
-        )}
+        {/* Type-specific icons */}
+        <div className="text-xs">
+          {card.type === 'property' && '🏠'}
+          {card.type === 'wild' && '🌟'}
+          {card.type === 'action' && '⚡'}
+          {card.type === 'rent' && '💰'}
+          {card.type === 'money' && '💎'}
+        </div>
       </div>
 
       {/* Hover overlay with description */}
       <motion.div
-        className="absolute inset-0 bg-black/90 backdrop-blur-sm text-white p-2 flex items-center justify-center text-center text-xs rounded-xl opacity-0 z-10"
+        className="absolute inset-0 bg-black/95 backdrop-blur-sm text-white p-2 flex items-center justify-center text-center text-xs rounded-xl opacity-0 z-20"
         whileHover={{ opacity: 1 }}
         transition={{ duration: 0.2 }}
       >
         <div>
-          <p className="font-semibold mb-1">{card.name}</p>
-          <p className="text-xs opacity-90">{card.description}</p>
+          <p className="font-black mb-1 text-yellow-300">{card.name}</p>
+          <p className="text-xs opacity-90 leading-relaxed">{card.description}</p>
+          <div className="mt-2 text-xs text-blue-300 font-bold">
+            Value: {card.value}M
+          </div>
         </div>
       </motion.div>
 
       {/* Selection glow effect */}
       {selected && (
         <motion.div
-          className="absolute inset-0 rounded-xl bg-blue-400/20 pointer-events-none"
+          className="absolute inset-0 rounded-xl bg-blue-400/30 pointer-events-none border-2 border-blue-400"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
         />
       )}
+
+      {/* Card shine effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none rounded-xl"></div>
     </motion.div>
   );
 }; 

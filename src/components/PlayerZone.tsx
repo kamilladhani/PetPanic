@@ -14,10 +14,10 @@ interface PlayerZoneProps {
 
 export const PlayerZone: React.FC<PlayerZoneProps> = ({
   player,
-  isCurrentPlayer,
-  isActive,
-  showHand = false,
+  isCurrentPlayer = false,
+  isActive = true,
   compact = false,
+  showHand = true,
 }) => {
   const getBankValue = () => {
     return player.bank.reduce((total, card) => total + card.value, 0);
@@ -51,7 +51,7 @@ export const PlayerZone: React.FC<PlayerZoneProps> = ({
             <Card
               key={card.id}
               card={card}
-              size="small"
+              size="medium"
               disabled={true}
             />
           ))}
@@ -64,38 +64,66 @@ export const PlayerZone: React.FC<PlayerZoneProps> = ({
     );
   };
 
+  const getCompleteSets = (properties: PropertySet[]) => {
+    return properties.filter(set => set.isComplete);
+  };
+
+  const completeSets = getCompleteSets(player.properties);
+  
   return (
     <motion.div
       className={`
-        bg-white/80 backdrop-blur-sm rounded-xl border-2 p-4
-        ${isCurrentPlayer ? 'border-blue-500 shadow-lg ring-2 ring-blue-200' : 'border-gray-200'}
-        ${compact ? 'max-w-sm' : 'w-full'}
+        ${compact ? 'p-4' : 'p-6'} 
+        ${isCurrentPlayer 
+          ? 'bg-gradient-to-br from-blue-200 via-white to-purple-200 border-4 border-blue-500 shadow-2xl shadow-blue-500/30' 
+          : 'bg-gradient-to-br from-gray-100 to-white border-3 border-gray-400 shadow-xl'
+        }
+        ${isActive ? 'ring-2 ring-green-400 ring-offset-2' : ''}
+        rounded-2xl backdrop-blur-sm relative overflow-hidden
       `}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300 }}
+      whileHover={{ scale: 1.02 }}
     >
       {/* Player Header */}
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center gap-2">
-          <div className="text-2xl">{player.avatar || '🐾'}</div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <motion.div 
+            className={`
+              text-3xl p-2 rounded-full 
+              ${isCurrentPlayer 
+                ? 'bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg' 
+                : 'bg-gradient-to-r from-gray-400 to-gray-500'
+              }
+            `}
+            animate={{ rotate: isActive ? [0, 5, -5, 0] : 0 }}
+            transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
+          >
+            {player.avatar}
+          </motion.div>
           <div>
-            <h3 className="font-bold text-gray-800">{player.name}</h3>
-            <div className="text-xs text-gray-600">
-              {isCurrentPlayer && isActive ? '🟢 Your Turn' : 
-               isCurrentPlayer ? '🔵 You' : 
-               '⚪ Waiting'}
-            </div>
+            <h3 className={`
+              font-black text-lg
+              ${isCurrentPlayer ? 'text-blue-800' : 'text-gray-800'}
+            `}>
+              {player.name}
+            </h3>
+            <p className="text-sm text-gray-600 font-semibold">
+              {completeSets.length}/3 complete sets
+            </p>
           </div>
         </div>
         
-        <div className="text-right">
-          <div className="text-sm font-medium text-gray-600">
-            Sets: {player.completedSets}/3
-          </div>
-          <div className="text-xs text-gray-500">
-            {player.hand.length} cards
-          </div>
+        {/* Hand count */}
+        <div className={`
+          px-3 py-2 rounded-full font-black text-sm shadow-lg border-2
+          ${isCurrentPlayer 
+            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-300' 
+            : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white border-gray-300'
+          }
+        `}>
+          {player.hand.length} cards
         </div>
       </div>
 
@@ -114,7 +142,7 @@ export const PlayerZone: React.FC<PlayerZoneProps> = ({
               <Card
                 key={card.id}
                 card={card}
-                size="small"
+                size="medium"
                 disabled={true}
               />
             ))
@@ -153,7 +181,7 @@ export const PlayerZone: React.FC<PlayerZoneProps> = ({
             <Card
               key={i}
               card={{} as CardType}
-              size="small"
+              size="medium"
               showBack={true}
               disabled={true}
             />

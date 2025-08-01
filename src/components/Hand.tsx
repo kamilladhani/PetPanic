@@ -33,15 +33,15 @@ export const Hand: React.FC<HandProps> = ({
   return (
     <div className="w-full">
       {/* Hand Title */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-black text-gray-800 drop-shadow-sm">
           {title}
         </h2>
-        <div className="text-sm text-gray-600 bg-white/60 rounded-full px-3 py-1">
-          <span className="font-semibold">{cards.length}</span>
-          <span className="text-gray-500"> cards</span>
+        <div className="text-sm text-gray-700 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl px-4 py-2 border-2 border-blue-200 shadow-lg">
+          <span className="font-black">{cards.length}</span>
+          <span className="text-gray-600 font-semibold"> cards</span>
           {selectedCards.length > 0 && (
-            <span className="ml-2 text-blue-600 font-bold">
+            <span className="ml-2 text-blue-700 font-black">
               • {selectedCards.length} selected
             </span>
           )}
@@ -118,22 +118,18 @@ export const Hand: React.FC<HandProps> = ({
       {/* Action hints */}
       {isActive && cards.length > 0 && (
         <motion.div 
-          className="mt-3 text-center"
+          className="mt-4 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
           {selectedCards.length === 0 ? (
-            <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm">
-              💡 <span className="font-medium">Tap cards to select them for playing</span>
-            </div>
-          ) : selectedCards.length < maxSelection ? (
-            <div className="bg-green-50 text-green-700 px-4 py-2 rounded-xl text-sm">
-              ✨ <span className="font-medium">Select {maxSelection - selectedCards.length} more cards</span> or play your current selection
+            <div className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 px-6 py-3 rounded-2xl text-sm font-bold border-2 border-blue-300 shadow-lg">
+              💡 <span className="font-black">Tap cards to play them instantly!</span>
             </div>
           ) : (
-            <div className="bg-orange-50 text-orange-700 px-4 py-2 rounded-xl text-sm font-medium">
-              🎯 <span className="font-medium">Maximum cards selected!</span> Ready to play
+            <div className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 px-6 py-3 rounded-2xl text-sm font-bold border-2 border-green-300 shadow-lg">
+              ✨ <span className="font-black">You can play {maxSelection - selectedCards.length} more cards this turn</span>
             </div>
           )}
         </motion.div>
