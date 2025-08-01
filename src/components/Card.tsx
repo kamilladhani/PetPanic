@@ -22,15 +22,21 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   const sizeClasses = {
     small: 'w-16 h-24 text-xs',
-    medium: 'w-24 h-36 text-sm',
-    large: 'w-28 h-40 text-base',
+    medium: 'w-32 h-48 text-sm', 
+    large: 'w-36 h-52 text-base',
+  };
+
+  const sizeStyles = {
+    small: { width: '64px', height: '96px', minWidth: '64px', maxWidth: '64px', minHeight: '96px', maxHeight: '96px' },
+    medium: { width: '128px', height: '192px', minWidth: '128px', maxWidth: '128px', minHeight: '192px', maxHeight: '192px' },
+    large: { width: '144px', height: '208px', minWidth: '144px', maxWidth: '144px', minHeight: '208px', maxHeight: '208px' },
   };
 
   if (showBack) {
     return (
       <motion.div
-        className={`${sizeClasses[size]} rounded-xl border-4 border-gray-800 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 flex items-center justify-center cursor-pointer shadow-2xl relative overflow-hidden`}
-        style={style}
+        className={`${sizeClasses[size]} rounded-xl border-4 border-gray-800 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 flex items-center justify-center cursor-pointer shadow-2xl relative overflow-hidden flex-shrink-0 flex-grow-0`}
+        style={{ ...style, ...sizeStyles[size] }}
         onClick={onClick}
         whileHover={{ scale: disabled ? 1 : 1.05, rotateY: 5 }}
         whileTap={{ scale: disabled ? 1 : 0.95 }}
@@ -118,11 +124,12 @@ export const Card: React.FC<CardProps> = ({
         ${borderColor} 
         ${textColor}
         rounded-xl border-4 flex flex-col relative overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl
-        ${selected ? 'ring-4 ring-blue-400 scale-105 ring-offset-2' : ''}
+        ${selected ? 'ring-4 ring-blue-400 ring-offset-2' : ''}
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         transform transition-all duration-200
+        flex-shrink-0 flex-grow-0
       `}
-      style={style}
+      style={{ ...style, ...sizeStyles[size] }}
       onClick={disabled ? undefined : onClick}
       whileHover={{ 
         scale: disabled ? 1 : 1.05, 
@@ -142,29 +149,50 @@ export const Card: React.FC<CardProps> = ({
       }}
     >
       {/* Card Header - Name and Value */}
-      <div className="bg-black/20 px-2 py-1 flex justify-between items-center">
-        <div className="text-2xl">{card.emoji}</div>
-        <div className={`text-xs font-black ${accentBg} text-gray-900 rounded-full px-2 py-1 shadow-sm border-2 border-white`}>
+      <div className="bg-black/20 px-4 py-3 flex justify-between items-center">
+        <div className="text-4xl">{card.emoji}</div>
+        <div className={`text-base font-black ${accentBg} text-gray-900 rounded-full px-4 py-2 shadow-sm border-2 border-white`}>
           {card.value}M
         </div>
       </div>
 
       {/* Card Body */}
-      <div className="flex-1 p-2 flex flex-col justify-center">
-        {/* Card Name */}
-        <div className="text-center mb-2">
-          <h3 className="font-black leading-tight text-center text-xs drop-shadow-md">
-            {card.name}
-          </h3>
-        </div>
+      <div className="flex-1 p-4 flex flex-col justify-center min-h-0">
+        {/* Card Name - Hidden for money cards */}
+        {card.type !== 'money' && (
+          <div className="text-center mb-3 px-3" style={{ minHeight: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h3 className="font-bold leading-tight text-center drop-shadow-md overflow-hidden text-white" style={{ 
+              fontSize: '16px',
+              lineHeight: '18px',
+              maxHeight: '44px',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical' as const,
+              wordBreak: 'break-word',
+              textAlign: 'center'
+            }}>
+              {card.name}
+            </h3>
+          </div>
+        )}
+
+        {/* Money cards get a large money display */}
+        {card.type === 'money' && (
+          <div className="text-center px-3">
+            <div className="text-6xl mb-3">{card.emoji}</div>
+            <div className="text-3xl font-black text-white drop-shadow-md">
+              {card.value}M
+            </div>
+          </div>
+        )}
 
         {/* Property Set Indicators */}
         {card.type === 'property' && (
-          <div className="flex justify-center space-x-1 mb-2">
+          <div className="flex justify-center space-x-2 mb-3">
             {Array.from({ length: card.setSize }, (_, i) => (
               <div 
                 key={i} 
-                className="w-2 h-2 rounded-full bg-white/80 shadow-sm"
+                className="w-3 h-3 rounded-full bg-white/80 shadow-sm"
               />
             ))}
           </div>
@@ -172,29 +200,40 @@ export const Card: React.FC<CardProps> = ({
         
         {/* Wild Card Color Indicators */}
         {card.type === 'wild' && (
-          <div className="flex justify-center items-center mb-1">
-            <div className="text-lg">⭐</div>
+          <div className="flex justify-center items-center mb-2">
+            <div className="text-2xl">⭐</div>
           </div>
         )}
       </div>
 
       {/* Card Footer - Type */}
-      <div className="bg-black/20 px-2 py-1 flex justify-between items-center">
-        <span className="text-xs font-black uppercase tracking-wide">
-          {card.type === 'wild' ? 'Wild' : 
-           card.type === 'property' ? 'Property' :
-           card.type === 'action' ? 'Action' :
-           card.type === 'rent' ? 'Rent' : 'Money'}
-        </span>
+      <div className="bg-black/20 px-4 py-3 flex justify-between items-center">
+        {/* Hide type label for money cards, show for others */}
+        {card.type !== 'money' && (
+          <span className="text-base font-black uppercase tracking-wide">
+            {card.type === 'wild' ? 'Wild' : 
+             card.type === 'property' ? 'Property' :
+             card.type === 'action' ? 'Action' :
+             card.type === 'rent' ? 'Rent' : ''}
+          </span>
+        )}
         
-        {/* Type-specific icons */}
-        <div className="text-xs">
-          {card.type === 'property' && '🏠'}
-          {card.type === 'wild' && '🌟'}
-          {card.type === 'action' && '⚡'}
-          {card.type === 'rent' && '💰'}
-          {card.type === 'money' && '💎'}
-        </div>
+        {/* Money cards show just the icon centered */}
+        {card.type === 'money' && (
+          <div className="flex-1 text-center">
+            <span className="text-3xl">💰</span>
+          </div>
+        )}
+        
+        {/* Type-specific icons for non-money cards */}
+        {card.type !== 'money' && (
+          <div className="text-xl">
+            {card.type === 'property' && '🏠'}
+            {card.type === 'wild' && '🌟'}
+            {card.type === 'action' && '⚡'}
+            {card.type === 'rent' && '💰'}
+          </div>
+        )}
       </div>
 
       {/* Hover overlay with description */}

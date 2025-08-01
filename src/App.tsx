@@ -23,60 +23,9 @@ function App() {
     cardsPlayed: gameState.cardsPlayed
   });
 
-  const handleCardSelect = (cardId: string) => {
-    console.log('🃏 Card selected:', cardId);
-    setSelectedCards(prev => {
-      if (prev.includes(cardId)) {
-        return prev.filter(id => id !== cardId);
-      } else {
-        // Limit selection based on remaining cards that can be played
-        const maxSelection = gameState.gameSettings.maxCardsPerTurn - gameState.cardsPlayed;
-        if (prev.length >= maxSelection) {
-          return prev;
-        }
-        return [...prev, cardId];
-      }
-    });
-  };
 
-  const handlePlayToBank = () => {
-    if (selectedCards.length === 0) return;
-    
-    console.log('💰 Playing to bank:', selectedCards);
-    selectedCards.forEach(cardId => {
-      const action: GameAction = {
-        type: 'PLAY_CARD_TO_BANK',
-        playerId: gameState.players[gameState.currentPlayerIndex].id,
-        cardId,
-      };
-      dispatch(action);
-    });
-    
-    setSelectedCards([]);
-  };
 
-  const handlePlayToProperty = () => {
-    if (selectedCards.length === 0) return;
-    
-    console.log('🏠 Playing to property:', selectedCards);
-    selectedCards.forEach(cardId => {
-      const action: GameAction = {
-        type: 'PLAY_CARD_TO_PROPERTY',
-        playerId: gameState.players[gameState.currentPlayerIndex].id,
-        cardId,
-      };
-      dispatch(action);
-    });
-    
-    setSelectedCards([]);
-  };
 
-  const handlePlayAction = () => {
-    console.log('⚡ Playing action:', selectedCards);
-    // For now, just treat action cards as money (play to bank)
-    // TODO: Implement specific action logic
-    handlePlayToBank();
-  };
 
   // New single-card play functions for immediate play
   const handlePlaySingleCardToBank = (cardId: string) => {
@@ -110,11 +59,14 @@ function App() {
   };
 
   const handleDrawCards = () => {
-    console.log('🎴 Drawing cards...');
+    console.log('🎴 Draw button clicked - Phase:', gameState.phase, 'Cards drawn:', gameState.cardsDrawn);
+    
+    // Let the reducer handle all validation - no duplicate logic here
     const action: GameAction = {
       type: 'DRAW_CARDS',
       playerId: gameState.players[gameState.currentPlayerIndex].id,
     };
+    
     dispatch(action);
   };
 
@@ -185,7 +137,8 @@ function App() {
           <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 mb-8 text-sm text-gray-800 border-2 border-blue-200 shadow-lg">
             <h3 className="font-black mb-3 text-base">Quick Rules:</h3>
             <ul className="text-left space-y-2 font-semibold">
-              <li>• Draw 2 cards each turn</li>
+              <li>• Start with 5 cards</li>
+              <li>• Draw 2 cards each turn (7 total)</li>
               <li>• Play up to 3 cards per turn</li>
               <li>• Build property sets by color</li>
               <li>• First to 3 complete sets wins!</li>
@@ -214,10 +167,6 @@ function App() {
       <GameBoard
         gameState={gameState}
         selectedCards={selectedCards}
-        onCardSelect={handleCardSelect}
-        onPlayToBank={handlePlayToBank}
-        onPlayToProperty={handlePlayToProperty}
-        onPlayAction={handlePlayAction}
         onDrawCards={handleDrawCards}
         onEndTurn={handleEndTurn}
         onPlaySingleCardToBank={handlePlaySingleCardToBank}

@@ -16,7 +16,7 @@ export const createInitialGameState = (playerNames: string[]): GameState => {
     avatar: ['🐶', '🐱', '🐹', '🐰', '🐠'][index] || '🐾',
   }));
 
-  // Deal initial hands (5 cards each)
+  // Deal initial hands (5 cards each, then draw 2 at start of each turn)
   players.forEach((player) => {
     for (let i = 0; i < 5; i++) {
       const card = deck.pop();
@@ -116,16 +116,30 @@ export const updatePlayerProperties = (player: Player): void => {
 
 // Game action handlers
 export const gameReducer = (state: GameState, action: GameAction): GameState => {
+  console.log('🔄 gameReducer called with action:', action.type, 'Current state cardsDrawn:', state.cardsDrawn);
   const newState = { ...state };
   const currentPlayer = newState.players[newState.currentPlayerIndex];
 
   switch (action.type) {
     case 'DRAW_CARDS': {
-      if (newState.phase !== 'draw' || newState.cardsDrawn >= newState.gameSettings.cardsPerTurnStart) {
+      console.log('🎴 DRAW_CARDS - Phase:', newState.phase, 'Already drawn:', newState.cardsDrawn, 'Hand:', currentPlayer.hand.length);
+      
+      // Must be in draw phase - this should be the ONLY check needed
+      if (newState.phase !== 'draw') {
+        console.log('❌ Not in draw phase');
         return state;
       }
 
-      const cardsToDraw = Math.min(2, newState.deck.length);
+      // Draw exactly the number of cards needed to complete the draw phase
+      const cardsStillNeeded = newState.gameSettings.cardsPerTurnStart - newState.cardsDrawn;
+      const cardsToDraw = Math.min(cardsStillNeeded, newState.deck.length);
+      
+      if (cardsToDraw <= 0) {
+        console.log('⚠️ No cards available to draw');
+        return state;
+      }
+      
+      // Draw cards
       for (let i = 0; i < cardsToDraw; i++) {
         const card = newState.deck.pop();
         if (card) {
@@ -134,10 +148,11 @@ export const gameReducer = (state: GameState, action: GameAction): GameState => 
         }
       }
 
-      // Move to play phase after drawing
-      if (newState.cardsDrawn >= newState.gameSettings.cardsPerTurnStart) {
-        newState.phase = 'play';
-      }
+      console.log('✅ Drew', cardsToDraw, 'cards - New hand size:', currentPlayer.hand.length, 'Total drawn:', newState.cardsDrawn);
+
+      // CRITICAL: Change phase IMMEDIATELY after drawing to block further draws
+      newState.phase = 'play';
+      console.log('🎯 Phase → play (drawing complete)');
 
       return newState;
     }

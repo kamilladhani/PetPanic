@@ -51,7 +51,7 @@ export const Hand: React.FC<HandProps> = ({
       {/* Cards Container */}
       <div className="relative">
         <motion.div 
-          className="flex gap-3 overflow-x-auto pb-4 px-1 scrollbar-hide"
+          className="flex gap-3 overflow-x-auto pb-4 px-1 scrollbar-hide items-start"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {cards.map((card, index) => (
@@ -65,8 +65,13 @@ export const Hand: React.FC<HandProps> = ({
                 stiffness: 300,
                 damping: 25,
               }}
-              style={{ scrollSnapAlign: 'start' }}
-              className="flex-shrink-0 relative"
+              style={{ 
+                scrollSnapAlign: 'start',
+                width: '128px',
+                minWidth: '128px',
+                maxWidth: '128px'
+              }}
+              className="relative"
             >
               <Card
                 card={card}
