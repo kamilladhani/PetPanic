@@ -9,10 +9,6 @@ import { PlayerZone } from './PlayerZone';
 interface GameBoardProps {
   gameState: GameState;
   selectedCards: string[];
-  onCardSelect: (cardId: string) => void;
-  onPlayToBank: () => void;
-  onPlayToProperty: () => void;
-  onPlayAction: () => void;
   onDrawCards: () => void;
   onEndTurn: () => void;
   onPlaySingleCardToBank: (cardId: string) => void;
@@ -23,10 +19,6 @@ interface GameBoardProps {
 export const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
   selectedCards,
-  onCardSelect,
-  onPlayToBank,
-  onPlayToProperty,
-  onPlayAction,
   onDrawCards,
   onEndTurn,
   onPlaySingleCardToBank,
@@ -237,20 +229,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               {/* Deck */}
               <div className="text-center">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative"
+                  whileHover={canDrawCards ? { scale: 1.05 } : {}}
+                  whileTap={canDrawCards ? { scale: 0.95 } : {}}
+                  className={`relative ${canDrawCards ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                  onClick={canDrawCards ? onDrawCards : undefined}
                 >
                   <Card
                     card={{} as CardType}
                     showBack={true}
-                    onClick={canDrawCards ? onDrawCards : undefined}
+                    onClick={undefined}
                     disabled={!canDrawCards}
                     size="medium"
                   />
                   {/* Deck depth effect */}
-                  <div className="absolute -top-1 -left-1 w-24 h-36 bg-gray-600 rounded-xl -z-10 opacity-60"></div>
-                  <div className="absolute -top-2 -left-2 w-24 h-36 bg-gray-700 rounded-xl -z-20 opacity-40"></div>
+                  <div className="absolute -top-1 -left-1 w-32 h-48 bg-gray-600 rounded-xl -z-10 opacity-60"></div>
+                  <div className="absolute -top-2 -left-2 w-32 h-48 bg-gray-700 rounded-xl -z-20 opacity-40"></div>
                 </motion.div>
                 <p className="text-xs mt-2 text-gray-800 font-black">
                   DRAW PILE ({gameState.deck.length})
@@ -261,7 +254,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
                   >
-                    👆 CLICK TO DRAW!
+                    👆 Click deck or button!
                   </motion.p>
                 )}
               </div>
@@ -279,13 +272,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                       size="medium"
                     />
                     {/* Discard pile depth effect */}
-                    <div className="absolute -top-1 -right-1 w-24 h-36 bg-gray-400 rounded-xl -z-10 opacity-50"></div>
+                    <div className="absolute -top-1 -right-1 w-32 h-48 bg-gray-400 rounded-xl -z-10 opacity-50"></div>
                   </div>
                 ) : (
-                  <div className="w-24 h-36 border-4 border-dashed border-gray-400 rounded-xl flex items-center justify-center text-gray-600 bg-gray-100">
+                  <div className="w-32 h-48 border-4 border-dashed border-gray-400 rounded-xl flex items-center justify-center text-gray-600 bg-gray-100">
                     <div className="text-center">
-                      <div className="text-2xl mb-1">🗑️</div>
-                      <span className="text-xs font-bold">EMPTY</span>
+                      <div className="text-3xl mb-2">🗑️</div>
+                      <span className="text-sm font-bold">EMPTY</span>
                     </div>
                   </div>
                 )}
